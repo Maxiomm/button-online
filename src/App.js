@@ -1,96 +1,52 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
+import Header from "./components/Header";
+import { useCountdown } from "./hooks/useCountdown";
 
 function App() {
+  // State to keep track of the count
   const [count, setCount] = useState(0);
+  // State to determine if it is the initial load of the component
   const [isInitialLoad, setIsInitialLoad] = useState(true);
-  const [timeLeft, setTimeLeft] = useState(0);
+  // Use the custom hook to get the time left for the countdown
+  const timeLeft = useCountdown(1);
 
-  // Read the saved value when the component mounts
+  // Effect to read the saved count value from localStorage when the component mounts
   useEffect(() => {
     const savedCount = localStorage.getItem("count");
     if (savedCount !== null) {
       setCount(parseInt(savedCount, 10));
     }
-    const initialTimeLeft = getTimeUntilNextReset();
-    setTimeLeft(initialTimeLeft);
-    setIsInitialLoad(false);
+    setIsInitialLoad(false); // Mark the initial load as complete
   }, []);
 
-  // Save the count value whenever it changes
+  // Effect to save the count value to localStorage whenever it changes
   useEffect(() => {
     if (!isInitialLoad) {
       localStorage.setItem("count", count);
     }
   }, [count, isInitialLoad]);
 
-  // Counter incrementation
+  // Function to increment the count
   const incrementCount = () => {
     setCount(count + 1);
   };
 
-  // Calculate the time in seconds until the next reset time
-  function getTimeUntilNextReset() {
-    const now = new Date();
-    const nextReset = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate(),
-      now.getHours(),
-      Math.ceil(now.getMinutes() / 5) * 5,
-      0,
-      0
-    );
-    if (nextReset <= now) {
-      nextReset.setMinutes(nextReset.getMinutes() + 5);
-    }
-    return Math.round((nextReset.getTime() - now.getTime()) / 1000);
-  }
-
-  const scheduleNextReset = useCallback(() => {
-    const timeToNextReset = getTimeUntilNextReset();
-    setTimeLeft(timeToNextReset);
-
-    const timeoutId = setTimeout(() => {
-      setCount(0);
-      scheduleNextReset();
-    }, timeToNextReset * 1000); // Convert seconds to milliseconds
-
-    return timeoutId;
-  }, []);
-
+  // Effect to reset the count to 0 when the timeLeft reaches 0
   useEffect(() => {
-    if (!isInitialLoad) {
-      // Schedule the initial reset
-      const timeoutId = scheduleNextReset();
-
-      // Update the countdown timer every second
-      const timer = setInterval(() => {
-        setTimeLeft((prevTimeLeft) => {
-          if (prevTimeLeft > 1) {
-            return prevTimeLeft - 1;
-          } else {
-            const newTimeLeft = getTimeUntilNextReset();
-            return newTimeLeft; // Reset timeLeft to the next period
-          }
-        });
-      }, 1000);
-
-      // Clear the interval and timeout on component unmount
-      return () => {
-        clearTimeout(timeoutId);
-        clearInterval(timer);
-      };
+    if (timeLeft === 0 && !isInitialLoad) {
+      console.log("reset du count.");
+      setCount(0);
     }
-  }, [isInitialLoad, scheduleNextReset]);
+  }, [timeLeft, isInitialLoad]);
 
   return (
     <div className="App">
-      <header className="App-header">
-        <h1>{count}</h1>
-        <button onClick={incrementCount}>Click</button>
-        <div className="timer">Next reset in: {timeLeft}s</div>
-      </header>
+      <Header
+        count={count}
+        incrementCount={incrementCount}
+        timeLeft={timeLeft}
+      />
     </div>
   );
 }
