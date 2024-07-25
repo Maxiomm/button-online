@@ -15,6 +15,9 @@ function App() {
   // State for the high score
   const [highScore, setHighScore] = useState(0);
 
+  // State for the high score date
+  const [highScoreDate, setHighScoreDate] = useState("");
+
   // State to determine if it is the initial load of the component
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
@@ -34,6 +37,9 @@ function App() {
 
   // Firebase reference for the high score
   const highScoreRef = ref(database, "highScore");
+
+  // Firebase reference for the high score date
+  const highScoreDateRef = ref(database, "highScoreDate");
 
   /* -----------METHODS----------- */
 
@@ -56,15 +62,24 @@ function App() {
         setHighScore(snapshot.val()); // Update local state with the high score from Firebase
       }
     });
-  }, [countRef, highScoreRef]);
+
+    onValue(highScoreDateRef, (snapshot) => {
+      if (snapshot.exists()) {
+        setHighScoreDate(snapshot.val());
+      }
+    });
+  }, [countRef, highScoreRef, highScoreDateRef]);
 
   // Effect to reset the count to 0 when the timeLeft reaches 0
   useEffect(() => {
     if (timeLeft === 0 && !isInitialLoad && !hasReset) {
       //console.log("reset count");
       if (count > highScore) {
+        const currentDate = new Date().toLocaleDateString(); // Get current date
         set(highScoreRef, count); // Update the high score in Firebase if current count is higher
+        set(highScoreDateRef, currentDate); // Update the high score date in Firebase
         setHighScore(count); // Update the local high score state
+        setHighScoreDate(currentDate); // Update the local high score date
       }
       set(countRef, 0).then(() => {
         setCount(0); // Reset the count in Firebase
@@ -79,6 +94,7 @@ function App() {
     highScore,
     countRef,
     highScoreRef,
+    highScoreDateRef,
   ]);
 
   // Effect to reset `hasReset` flag when `timeLeft` is no longer 0
@@ -98,6 +114,7 @@ function App() {
         timeLeft={timeLeft}
         onlineCount={onlineCount}
         highScore={highScore}
+        highScoreDate={highScoreDate}
       />
     </div>
   );
