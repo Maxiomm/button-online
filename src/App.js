@@ -12,6 +12,9 @@ function App() {
   // State to keep track of the count
   const [count, setCount] = useState(0);
 
+  // State to keep track of the individual count
+  const [individualCount, setIndividualCount] = useState(0);
+
   // State for the high score
   const [highScore, setHighScore] = useState(0);
 
@@ -46,6 +49,7 @@ function App() {
   // Function to increment the count
   const incrementCount = () => {
     set(countRef, count + 1); // Update the count in Firebase
+    setIndividualCount(individualCount + 1);
   };
 
   // Effect to read the click count and high score values from Firebase when the component mounts
@@ -83,6 +87,7 @@ function App() {
       }
       set(countRef, 0).then(() => {
         setCount(0); // Reset the count in Firebase
+        setIndividualCount(0);
         setHasReset(true);
       });
     }
@@ -110,6 +115,7 @@ function App() {
     <div className="App">
       <Header
         count={count}
+        individualCount={individualCount}
         incrementCount={incrementCount}
         timeLeft={timeLeft}
         onlineCount={onlineCount}
