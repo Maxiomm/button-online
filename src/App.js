@@ -15,6 +15,12 @@ function App() {
   // State to keep track of the individual count
   const [individualCount, setIndividualCount] = useState(0);
 
+  // State for start time
+  const [startTime, setStartTime] = useState(null);
+
+  // State to keep track of clicks per second
+  const [cps, setCps] = useState(0);
+
   // State for the high score
   const [highScore, setHighScore] = useState(0);
 
@@ -28,7 +34,12 @@ function App() {
   const [hasReset, setHasReset] = useState(false); // Track if reset has been done
 
   // Use the custom hook to get the time left for the countdown
-  const timeLeft = useCountdown(1);
+  const timeLeft = useCountdown(1, () => {
+    if (startTime) {
+      const elapsedTime = (Date.now() - startTime) / 1000; // Time elapsed in seconds
+      setCps((individualCount / elapsedTime).toFixed(2)); // Calculate CPS and format to 2 decimal places
+    }
+  });
 
   // Use the custom hook to get the number of online people on the app
   const onlineCount = useOnlineUsers();
@@ -49,7 +60,10 @@ function App() {
   // Function to increment the count
   const incrementCount = () => {
     set(countRef, count + 1); // Update the count in Firebase
-    setIndividualCount(individualCount + 1);
+    setIndividualCount((prevCount) => prevCount + 1); // Update the local individual count
+    if (!startTime) {
+      setStartTime(Date.now()); // Set start time if not already set
+    }
   };
 
   // Effect to read the click count and high score values from Firebase when the component mounts
@@ -87,8 +101,10 @@ function App() {
       }
       set(countRef, 0).then(() => {
         setCount(0); // Reset the count in Firebase
-        setIndividualCount(0);
-        setHasReset(true);
+        setIndividualCount(0); // Reset the individual count
+        setStartTime(null); // Reset start time
+        setCps(0); // Reset CPS
+        setHasReset(true); // Indicate that reset has been done
       });
     }
   }, [
@@ -109,6 +125,18 @@ function App() {
     }
   }, [timeLeft, hasReset]);
 
+  // Effet pour mettre à jour le CPS toutes les 100ms
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (startTime) {
+        const elapsedTime = (Date.now() - startTime) / 1000; // Time elapsed in seconds
+        setCps((individualCount / elapsedTime).toFixed(2)); // Calculate CPS and format to 2 decimal places
+      }
+    }, 100); // Update every 100ms
+
+    return () => clearInterval(interval); // Cleanup interval on component unmount
+  }, [startTime, individualCount]);
+
   /* -----------HTML----------- */
 
   return (
@@ -116,6 +144,7 @@ function App() {
       <Header
         count={count}
         individualCount={individualCount}
+        cps={cps}
         incrementCount={incrementCount}
         timeLeft={timeLeft}
         onlineCount={onlineCount}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 
 // Custom hook to manage a countdown timer that resets at a specified interval
-export const useCountdown = (resetInterval) => {
+export const useCountdown = (resetInterval, onTick) => {
   // State to keep track of the time left until the next reset
   const [timeLeft, setTimeLeft] = useState(
     getTimeUntilNextReset(resetInterval)
@@ -50,6 +50,9 @@ export const useCountdown = (resetInterval) => {
         //console.log("Time left:", newTimeLeft);
         return newTimeLeft;
       });
+      if (onTick) {
+        onTick(); // Call the onTick callback if provided
+      }
     }, 1000); // Update the time left every second
 
     // Clean up the timeout and interval on component unmount
@@ -57,7 +60,7 @@ export const useCountdown = (resetInterval) => {
       clearTimeout(timeoutId);
       clearInterval(timer);
     };
-  }, [scheduleNextReset, resetInterval]);
+  }, [scheduleNextReset, resetInterval, onTick]);
 
   return timeLeft; // Return the time left to the component using the hook
 };
