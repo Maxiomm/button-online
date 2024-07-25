@@ -13,6 +13,9 @@ function App() {
   // State to determine if it is the initial load of the component
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
+  // Track if reset has been done
+  const [hasReset, setHasReset] = useState(false); // Track if reset has been done
+
   // Use the custom hook to get the time left for the countdown
   const timeLeft = useCountdown(1);
 
@@ -39,11 +42,21 @@ function App() {
 
   // Effect to reset the count to 0 when the timeLeft reaches 0
   useEffect(() => {
-    if (timeLeft === 0 && !isInitialLoad) {
-      console.log("reset count.");
-      set(countRef, 0); // Reset the count in Firebase
+    if (timeLeft === 0 && !isInitialLoad && !hasReset) {
+      console.log("reset count");
+      set(countRef, 0).then(() => {
+        setCount(0); // Reset the count in Firebase
+        setHasReset(true);
+      });
     }
-  }, [timeLeft, isInitialLoad, countRef]);
+  }, [timeLeft, isInitialLoad, hasReset, countRef]);
+
+  // Effect to reset `hasReset` flag when `timeLeft` is no longer 0
+  useEffect(() => {
+    if (timeLeft !== 0 && hasReset) {
+      setHasReset(false);
+    }
+  }, [timeLeft, hasReset]);
 
   return (
     <div className="App">

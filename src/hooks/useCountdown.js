@@ -44,10 +44,10 @@ export const useCountdown = (resetInterval) => {
     const timer = setInterval(() => {
       setTimeLeft((prevTimeLeft) => {
         const newTimeLeft =
-          prevTimeLeft > 1
+          prevTimeLeft > 0
             ? prevTimeLeft - 1
             : getTimeUntilNextReset(resetInterval);
-        console.log("Time left:", newTimeLeft); // Log timeLeft
+        //console.log("Time left:", newTimeLeft);
         return newTimeLeft;
       });
     }, 1000); // Update the time left every second
