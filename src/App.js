@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import "./App.css";
 import Header from "./components/Header";
 import { useCountdown } from "./hooks/useCountdown";
@@ -55,6 +55,9 @@ function App() {
   // Firebase reference for the high score date
   const highScoreDateRef = ref(database, "highScoreDate");
 
+  // Firebase reference for the last reset date
+  const lastResetDateRef = ref(database, "lastResetDate");
+
   /* -----------METHODS----------- */
 
   // Function to increment the count
@@ -66,7 +69,37 @@ function App() {
     }
   };
 
-  // Effect to read the click count and high score values from Firebase when the component mounts
+  // Function to reset the counter if needed based on the last reset date
+  const resetCounterIfNeeded = useCallback(
+    (lastResetDate) => {
+      const today = new Date().toISOString().split("T")[0];
+      if (lastResetDate !== today) {
+        if (count > highScore) {
+          const currentDate = new Date().toLocaleDateString();
+          set(highScoreRef, count);
+          set(highScoreDateRef, currentDate);
+          setHighScore(count);
+          setHighScoreDate(currentDate);
+        }
+        set(countRef, 0);
+        set(lastResetDateRef, today);
+        setCount(0);
+        setIndividualCount(0);
+        setStartTime(null);
+        setCps(0);
+      }
+    },
+    [
+      count,
+      highScore,
+      highScoreRef,
+      highScoreDateRef,
+      countRef,
+      lastResetDateRef,
+    ]
+  );
+
+  // Effect to read the values from Firebase when the component mounts
   useEffect(() => {
     onValue(countRef, (snapshot) => {
       if (snapshot.exists()) {
@@ -86,7 +119,23 @@ function App() {
         setHighScoreDate(snapshot.val());
       }
     });
-  }, [countRef, highScoreRef, highScoreDateRef]);
+
+    onValue(lastResetDateRef, (snapshot) => {
+      if (snapshot.exists()) {
+        resetCounterIfNeeded(snapshot.val());
+      } else {
+        // If the last reset date does not exist, initialize it
+        const today = new Date().toISOString().split("T")[0];
+        set(lastResetDateRef, today);
+      }
+    });
+  }, [
+    countRef,
+    highScoreRef,
+    highScoreDateRef,
+    lastResetDateRef,
+    resetCounterIfNeeded,
+  ]);
 
   // Effect to reset the count to 0 when the timeLeft reaches 0
   useEffect(() => {
