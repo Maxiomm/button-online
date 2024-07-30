@@ -69,34 +69,38 @@ function App() {
     }
   };
 
-  // Function to reset the counter if needed based on the last reset date
+  // Function to reset the counter if needed based on the last reset date and time
   const resetCounterIfNeeded = useCallback(
     (lastResetDate) => {
-      const today = new Date().toISOString().split("T")[0];
-      if (lastResetDate !== today) {
-        if (count > highScore) {
-          const currentDate = new Date().toLocaleDateString();
-          set(highScoreRef, count);
-          set(highScoreDateRef, currentDate);
-          setHighScore(count);
-          setHighScoreDate(currentDate);
-        }
-        set(countRef, 0);
-        set(lastResetDateRef, today);
-        setCount(0);
-        setIndividualCount(0);
-        setStartTime(null);
-        setCps(0);
+      const now = new Date();
+      const nowString = now.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+
+      // Check if the last reset date is different from the current date-time string
+      if (lastResetDate !== nowString) {
+        // Fetch the current high score from Firebase
+        onValue(highScoreRef, (snapshot) => {
+          const currentHighScore = snapshot.val() || 0;
+
+          // Only update high score if the current count is greater than the existing high score
+          if (count > currentHighScore) {
+            const currentDate = now.toLocaleDateString();
+            set(highScoreRef, count);
+            set(highScoreDateRef, currentDate);
+            setHighScore(count);
+            setHighScoreDate(currentDate);
+          }
+
+          // Reset the counter
+          set(countRef, 0);
+          set(lastResetDateRef, nowString);
+          setCount(0);
+          setIndividualCount(0);
+          setStartTime(null);
+          setCps(0);
+        });
       }
     },
-    [
-      count,
-      highScore,
-      highScoreRef,
-      highScoreDateRef,
-      countRef,
-      lastResetDateRef,
-    ]
+    [count, highScoreRef, highScoreDateRef, countRef, lastResetDateRef]
   );
 
   // Effect to read the values from Firebase when the component mounts
@@ -124,9 +128,9 @@ function App() {
       if (snapshot.exists()) {
         resetCounterIfNeeded(snapshot.val());
       } else {
-        // If the last reset date does not exist, initialize it
-        const today = new Date().toISOString().split("T")[0];
-        set(lastResetDateRef, today);
+        const now = new Date();
+        const nowString = now.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
+        set(lastResetDateRef, nowString);
       }
     });
   }, [
