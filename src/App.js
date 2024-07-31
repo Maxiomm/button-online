@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import "./App.css";
 import Header from "./components/Header";
+import Body from "./components/Body";
 import { useCountdown } from "./hooks/useCountdown";
 import { useOnlineUsers } from "./hooks/useOnlineUsers";
 import { ref, onValue, set } from "firebase/database";
@@ -204,6 +205,7 @@ function App() {
         highScore={highScore}
         highScoreDate={highScoreDate}
       />
+      <Body />
     </div>
   );
 }
