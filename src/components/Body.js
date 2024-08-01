@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import Header from "./Header";
 import Stats from "./Stats";
 import ClickButton from "./ClickButton";
-import ThemeToggle from "./ThemeToggle";
 import { useCountdown } from "../hooks/useCountdown";
 import { useOnlineUsers } from "../hooks/useOnlineUsers";
 import { ref, onValue, set } from "firebase/database";
@@ -36,7 +35,10 @@ function Body() {
   const [hasReset, setHasReset] = useState(false); // Track if reset has been done
 
   // State to change UI mode
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const savedTheme = localStorage.getItem("theme");
+    return savedTheme ? JSON.parse(savedTheme) : false;
+  });
 
   // Use the custom hook to get the time left for the countdown
   const timeLeft = useCountdown(1, () => {
@@ -110,11 +112,14 @@ function Body() {
 
   // Toggle theme function
   const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.setAttribute(
-      "data-theme",
-      isDarkMode ? "light" : "dark"
-    );
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme);
+    localStorage.setItem("theme", JSON.stringify(newTheme));
+    if (newTheme) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.setAttribute("data-theme", "light");
+    }
   };
 
   // Effect to read the values from Firebase when the component mounts
@@ -204,21 +209,41 @@ function Body() {
     return () => clearInterval(interval); // Cleanup interval on component unmount
   }, [startTime, individualCount]);
 
+  // Effect to apply the saved theme on mount
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+      const isDark = JSON.parse(savedTheme);
+      setIsDarkMode(isDark);
+      document.documentElement.setAttribute(
+        "data-theme",
+        isDark ? "dark" : "light"
+      );
+    }
+  }, []);
+
   /* -----------HTML----------- */
 
   return (
-    <div>
+    <div className="flex flex-col h-screen justify-between bg-base-100 dark:bg-gray-900 w-full">
       <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
-      <Stats
-        count={count}
-        individualCount={individualCount}
-        cps={cps}
-        timeLeft={timeLeft}
-        onlineCount={onlineCount}
-        highScore={highScore}
-        highScoreDate={highScoreDate}
-      />
-      <ClickButton incrementCount={incrementCount} />
+      <div className="flex-grow flex justify-center items-center w-full">
+        <ClickButton incrementCount={incrementCount} />
+      </div>
+      <div className="w-full flex justify-center mb-4">
+        <div className="max-w-5xl w-full">
+          <Stats
+            count={count}
+            individualCount={individualCount}
+            cps={cps}
+            timeLeft={timeLeft}
+            onlineCount={onlineCount}
+            highScore={highScore}
+            highScoreDate={highScoreDate}
+            isDarkMode={isDarkMode}
+          />
+        </div>
+      </div>
     </div>
   );
 }
