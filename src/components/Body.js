@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Header from "./Header";
 import Stats from "./Stats";
 import ClickButton from "./ClickButton";
+import MovingDots from "./MovingDots";
 import { useCountdown } from "../hooks/useCountdown";
 import { useOnlineUsers } from "../hooks/useOnlineUsers";
 import { ref, onValue, set } from "firebase/database";
@@ -164,7 +165,8 @@ function Body() {
   useEffect(() => {
     if (timeLeft === 0 && !isInitialLoad && !hasReset) {
       //console.log("reset count");
-      if (count > highScore) {
+      const currentHighScore = highScore; // Use local state instead of Firebase query
+      if (count > currentHighScore) {
         const currentDate = new Date().toLocaleDateString(); // Get current date
         set(highScoreRef, count); // Update the high score in Firebase if current count is higher
         set(highScoreDateRef, currentDate); // Update the high score date in Firebase
@@ -225,9 +227,10 @@ function Body() {
   /* -----------HTML----------- */
 
   return (
-    <div className="flex flex-col h-screen justify-between bg-base-100 dark:bg-gray-900 w-full">
+    <div className="relative flex flex-col h-screen bg-base-100 dark:bg-gray-900 w-full overflow-hidden">
+      <MovingDots />
       <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
-      <div className="flex-grow flex justify-center items-center w-full">
+      <div className="flex-grow flex justify-center items-center h-full mt-20">
         <ClickButton incrementCount={incrementCount} />
       </div>
       <div className="w-full flex justify-center mb-4">

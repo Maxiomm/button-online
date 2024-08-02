@@ -11,7 +11,7 @@ function ThemeToggle({ toggleTheme, isDarkMode }) {
       {/* Sun Icon */}
       <FontAwesomeIcon
         icon={faSun}
-        className="swap-on fill-current w-10 h-10 text-yellow-500 transition-transform transform hover:scale-110"
+        className="swap-on fill-current w-10 h-10 text-gray-400 transition-transform transform hover:scale-110"
       />
 
       {/* Moon Icon */}

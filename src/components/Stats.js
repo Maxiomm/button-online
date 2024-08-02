@@ -53,6 +53,21 @@ function Stats({
           <div className="stat">
             <div className="stat-title flex items-center justify-center">
               Online Users
+              <div className="relative flex items-center ml-2">
+                <span
+                  className={`absolute h-6 w-6 rounded-full border-2 animate-pulsate ${
+                    isDarkMode
+                      ? "border-neonGreenDark"
+                      : "border-neonGreenLight"
+                  }`}
+                  style={{ top: "-6px", left: "-6px" }}
+                ></span>
+                <span
+                  className={`relative inline-flex rounded-full h-3 w-3 ${
+                    isDarkMode ? "bg-neonGreenDark" : "bg-neonGreenLight"
+                  }`}
+                ></span>
+              </div>
             </div>
             <div className="stat-value flex items-center justify-center">
               {onlineCount}
