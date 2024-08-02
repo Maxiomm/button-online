@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import Confetti from "react-confetti";
 import Header from "./Header";
 import Stats from "./Stats";
 import ClickButton from "./ClickButton";
@@ -41,6 +42,9 @@ function Body() {
     return savedTheme ? JSON.parse(savedTheme) : false;
   });
 
+  // State to know if it's a HighScore for confetti display
+  const [isHighScore, setIsHighScore] = useState(false);
+
   // Use the custom hook to get the time left for the countdown
   const timeLeft = useCountdown(1, () => {
     if (startTime) {
@@ -51,6 +55,12 @@ function Body() {
 
   // Use the custom hook to get the number of online people on the app
   const onlineCount = useOnlineUsers();
+
+  // Audio reference for cheering sounds when the HighScore is beaten
+  const audioRef = useRef(null);
+
+  // State to change opacity of the confettis
+  const [confettiOpacity, setConfettiOpacity] = useState(1);
 
   /* -----------FIREBASE REFERENCES----------- */
 
@@ -81,34 +91,35 @@ function Body() {
   const resetCounterIfNeeded = useCallback(
     (lastResetDate) => {
       const now = new Date();
-      const nowString = now.toISOString().slice(0, 16); // YYYY-MM-DDTHH:MM
-
-      // Check if the last reset date is different from the current date-time string
+      const nowString = now.toISOString().slice(0, 16);
       if (lastResetDate !== nowString) {
-        // Fetch the current high score from Firebase
-        onValue(highScoreRef, (snapshot) => {
-          const currentHighScore = snapshot.val() || 0;
-
-          // Only update high score if the current count is greater than the existing high score
-          if (count > currentHighScore) {
-            const currentDate = now.toLocaleDateString();
-            set(highScoreRef, count);
-            set(highScoreDateRef, currentDate);
-            setHighScore(count);
-            setHighScoreDate(currentDate);
-          }
-
-          // Reset the counter
-          set(countRef, 0);
-          set(lastResetDateRef, nowString);
+        const currentHighScore = highScore;
+        if (count > currentHighScore) {
+          const currentDate = now.toLocaleDateString();
+          set(highScoreRef, count);
+          set(highScoreDateRef, currentDate);
+          setHighScore(count);
+          setHighScoreDate(currentDate);
+          setIsHighScore(true); // Set the flag to trigger confetti and sound
+        }
+        set(countRef, 0).then(() => {
           setCount(0);
           setIndividualCount(0);
           setStartTime(null);
           setCps(0);
+          setHasReset(true);
         });
+        set(lastResetDateRef, nowString);
       }
     },
-    [count, highScoreRef, highScoreDateRef, countRef, lastResetDateRef]
+    [
+      count,
+      highScore,
+      highScoreRef,
+      highScoreDateRef,
+      countRef,
+      lastResetDateRef,
+    ]
   );
 
   // Toggle theme function
@@ -164,7 +175,6 @@ function Body() {
   // Effect to reset the count to 0 when the timeLeft reaches 0
   useEffect(() => {
     if (timeLeft === 0 && !isInitialLoad && !hasReset) {
-      //console.log("reset count");
       const currentHighScore = highScore; // Use local state instead of Firebase query
       if (count > currentHighScore) {
         const currentDate = new Date().toLocaleDateString(); // Get current date
@@ -172,6 +182,7 @@ function Body() {
         set(highScoreDateRef, currentDate); // Update the high score date in Firebase
         setHighScore(count); // Update the local high score state
         setHighScoreDate(currentDate); // Update the local high score date
+        setIsHighScore(true); // Set the flag to trigger confetti
       }
       set(countRef, 0).then(() => {
         setCount(0); // Reset the count in Firebase
@@ -224,10 +235,47 @@ function Body() {
     }
   }, []);
 
+  // Handle confetti cleanup after display
+  useEffect(() => {
+    if (isHighScore) {
+      if (audioRef.current) {
+        audioRef.current.play();
+      }
+
+      const fadeOutInterval = setInterval(() => {
+        setConfettiOpacity((prevOpacity) => {
+          if (prevOpacity > 0) {
+            return prevOpacity - 0.02; // Réduire l'opacité progressivement
+          } else {
+            clearInterval(fadeOutInterval);
+            return 0;
+          }
+        });
+      }, 100); // Intervalle de 100ms pour réduire l'opacité
+
+      const timer = setTimeout(() => {
+        setIsHighScore(false);
+      }, 4000); // Display confetti for 4 seconds
+
+      return () => {
+        clearTimeout(timer);
+        clearInterval(fadeOutInterval);
+      };
+    }
+  }, [isHighScore, startTime]);
+
   /* -----------HTML----------- */
 
   return (
     <div className="relative flex flex-col h-screen bg-base-100 dark:bg-gray-900 w-full overflow-hidden">
+      {isHighScore && (
+        <Confetti
+          opacity={confettiOpacity}
+          width={window.innerWidth}
+          height={window.innerHeight}
+        />
+      )}
+      <audio ref={audioRef} src="sounds/cheer.mp3" />
       <MovingDots />
       <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
       <div className="flex-grow flex justify-center items-center h-full mt-20">
