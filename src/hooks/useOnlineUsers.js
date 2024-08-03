@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { ref, onValue, push, set, onDisconnect, off } from "firebase/database";
-import { database } from "../firebase";
+import { database } from "../config/firebase";
 
 // Custom hook to manage online users count
 export const useOnlineUsers = () => {

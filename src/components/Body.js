@@ -7,7 +7,8 @@ import MovingDots from "./MovingDots";
 import { useCountdown } from "../hooks/useCountdown";
 import { useOnlineUsers } from "../hooks/useOnlineUsers";
 import { ref, onValue, set } from "firebase/database";
-import { database } from "../firebase";
+import { database } from "../config/firebase";
+import cheerSound from "../assets/sounds/cheer.mp3";
 
 function Body() {
   /* -----------HOOKS----------- */
@@ -278,7 +279,7 @@ function Body() {
           height={window.innerHeight}
         />
       )}
-      <audio ref={audioRef} src="sounds/cheer.mp3" />
+      <audio ref={audioRef} src={cheerSound} preload="auto" />
       <MovingDots />
       <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
       <div className="flex-grow flex justify-center items-center h-full mt-20">
