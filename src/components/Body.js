@@ -100,6 +100,7 @@ function Body() {
           set(highScoreDateRef, currentDate);
           setHighScore(count);
           setHighScoreDate(currentDate);
+          setConfettiOpacity(1); // Reset conffeti opacity
           setIsHighScore(true); // Set the flag to trigger confetti and sound
         }
         set(countRef, 0).then(() => {
@@ -182,6 +183,7 @@ function Body() {
         set(highScoreDateRef, currentDate); // Update the high score date in Firebase
         setHighScore(count); // Update the local high score state
         setHighScoreDate(currentDate); // Update the local high score date
+        setConfettiOpacity(1); // Reset conffeti opacity
         setIsHighScore(true); // Set the flag to trigger confetti
       }
       set(countRef, 0).then(() => {
@@ -245,7 +247,7 @@ function Body() {
       const fadeOutInterval = setInterval(() => {
         setConfettiOpacity((prevOpacity) => {
           if (prevOpacity > 0) {
-            return prevOpacity - 0.02; // Réduire l'opacité progressivement
+            return prevOpacity - 0.025; // Réduire l'opacité progressivement
           } else {
             clearInterval(fadeOutInterval);
             return 0;
@@ -255,6 +257,7 @@ function Body() {
 
       const timer = setTimeout(() => {
         setIsHighScore(false);
+        setConfettiOpacity(1); // Reset conffeti opacity
       }, 4000); // Display confetti for 4 seconds
 
       return () => {
