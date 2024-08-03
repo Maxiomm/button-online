@@ -17,11 +17,16 @@ module.exports = {
           "50%": { opacity: "1.0" },
           "100%": { transform: "scale(0.9)", opacity: "0.0" },
         },
+        shrink: {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(0.9)" },
+        },
       },
       animation: {
         spin: "spin 2s linear infinite",
         scaleUp: "scaleUp 0.2s forwards",
         pulsate: "pulsate 1.2s ease-out infinite",
+        shrink: "shrink 0.2s ease-in-out",
       },
       colors: {
         neonGreenLight: "#3BEE22",
