@@ -63,6 +63,9 @@ function Body() {
   // State to change opacity of the confettis
   const [confettiOpacity, setConfettiOpacity] = useState(1);
 
+  // State for the difference between new and old highscore
+  const [highScoreDifference, setHighScoreDifference] = useState(0);
+
   /* -----------FIREBASE REFERENCES----------- */
 
   // Firebase reference for the click count
@@ -96,11 +99,13 @@ function Body() {
       if (lastResetDate !== nowString) {
         const currentHighScore = highScore;
         if (count > currentHighScore) {
+          const difference = count - currentHighScore;
           const currentDate = now.toLocaleDateString();
           set(highScoreRef, count);
           set(highScoreDateRef, currentDate);
           setHighScore(count);
           setHighScoreDate(currentDate);
+          setHighScoreDifference(difference);
           setConfettiOpacity(1); // Reset conffeti opacity
           setIsHighScore(true); // Set the flag to trigger confetti and sound
         }
@@ -179,11 +184,13 @@ function Body() {
     if (timeLeft === 0 && !isInitialLoad && !hasReset) {
       const currentHighScore = highScore; // Use local state instead of Firebase query
       if (count > currentHighScore) {
+        const difference = count - currentHighScore;
         const currentDate = new Date().toLocaleDateString(); // Get current date
         set(highScoreRef, count); // Update the high score in Firebase if current count is higher
         set(highScoreDateRef, currentDate); // Update the high score date in Firebase
         setHighScore(count); // Update the local high score state
         setHighScoreDate(currentDate); // Update the local high score date
+        setHighScoreDifference(difference); // Update highscore difference
         setConfettiOpacity(1); // Reset conffeti opacity
         setIsHighScore(true); // Set the flag to trigger confetti
       }
@@ -259,7 +266,7 @@ function Body() {
       const timer = setTimeout(() => {
         setIsHighScore(false);
         setConfettiOpacity(1); // Reset conffeti opacity
-      }, 4000); // Display confetti for 4 seconds
+      }, 6000); // Display confetti for 6 seconds
 
       return () => {
         clearTimeout(timer);
@@ -296,6 +303,7 @@ function Body() {
             highScore={highScore}
             highScoreDate={highScoreDate}
             isDarkMode={isDarkMode}
+            highScoreDifference={highScoreDifference}
           />
         </div>
       </div>

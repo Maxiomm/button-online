@@ -21,17 +21,25 @@ module.exports = {
           "0%, 100%": { transform: "scale(1)" },
           "50%": { transform: "scale(0.9)" },
         },
+        fadeUp: {
+          "0%": { opacity: 1, transform: "translateY(0)" },
+          "100%": { opacity: 0, transform: "translateY(-8px)" },
+        },
       },
       animation: {
         spin: "spin 2s linear infinite",
         scaleUp: "scaleUp 0.2s forwards",
         pulsate: "pulsate 1.2s ease-out infinite",
         shrink: "shrink 0.2s ease-in-out",
+        fadeUp: "fadeUp 2s ease-out forwards",
       },
       colors: {
         neonGreenLight: "#3BEE22",
         neonGreenDark: "#39FF14",
         darkGreen: "#006400",
+      },
+      spacing: {
+        "1/2.5": "40%", // HighScore difference
       },
     },
   },

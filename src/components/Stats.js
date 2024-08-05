@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 function Stats({
   count,
@@ -9,7 +9,21 @@ function Stats({
   highScore,
   highScoreDate,
   isDarkMode,
+  highScoreDifference,
 }) {
+  const [showDifference, setShowDifference] = useState(false);
+
+  useEffect(() => {
+    if (highScoreDifference !== 0) {
+      setShowDifference(true);
+      const timer = setTimeout(() => {
+        setShowDifference(false);
+      }, 1000); // Display for 1 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [highScoreDifference]);
+
   return (
     <div
       className={`card w-full bg-base-100 shadow-xl my-4 border-2 ${
@@ -73,7 +87,12 @@ function Stats({
               {onlineCount}
             </div>
           </div>
-          <div className="stat">
+          <div className="stat relative">
+            {showDifference && (
+              <div className="stat-difference animate-fadeUp font-bold text-green-500 text-lg absolute left-1/2.5 select-none text-center">
+                +{highScoreDifference}
+              </div>
+            )}
             <div className="stat-title flex items-center justify-center">
               High Score
             </div>
