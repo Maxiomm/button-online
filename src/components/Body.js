@@ -9,6 +9,7 @@ import { useOnlineUsers } from "../hooks/useOnlineUsers";
 import { ref, onValue, set } from "firebase/database";
 import { database } from "../config/firebase";
 import cheerSound from "../assets/sounds/cheer.mp3";
+import CPS_WR from "../utils/constants";
 
 function Body() {
   /* -----------HOOKS----------- */
@@ -65,6 +66,12 @@ function Body() {
 
   // State for the difference between new and old highscore
   const [highScoreDifference, setHighScoreDifference] = useState(0);
+
+  // State to track the time over CPS threshold
+  const [timeOverThreshold, setTimeOverThreshold] = useState(0);
+
+  // State to handle the modal display
+  const [showModal, setShowModal] = useState(false);
 
   /* -----------FIREBASE REFERENCES----------- */
 
@@ -220,17 +227,28 @@ function Body() {
     }
   }, [timeLeft, hasReset]);
 
-  // Effet pour mettre à jour le CPS toutes les 100ms
+  // Effect to update CPS every 100ms
   useEffect(() => {
     const interval = setInterval(() => {
       if (startTime) {
         const elapsedTime = (Date.now() - startTime) / 1000; // Time elapsed in seconds
-        setCps((individualCount / elapsedTime).toFixed(2)); // Calculate CPS and format to 2 decimal places
+        const currentCps = (individualCount / elapsedTime).toFixed(2); // Calculate CPS and format to 2 decimal places
+        setCps(currentCps);
+
+        if (currentCps > CPS_WR) {
+          setTimeOverThreshold((prev) => prev + 0.1);
+        } else {
+          setTimeOverThreshold(0);
+        }
+
+        if (timeOverThreshold >= 2) {
+          setShowModal(true); // Display cheating alert
+        }
       }
     }, 100); // Update every 100ms
 
     return () => clearInterval(interval); // Cleanup interval on component unmount
-  }, [startTime, individualCount]);
+  }, [startTime, individualCount, cps, timeOverThreshold]);
 
   // Effect to apply the saved theme on mount
   useEffect(() => {
@@ -307,6 +325,34 @@ function Body() {
           />
         </div>
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="modal modal-open">
+            <div className="modal-box">
+              <h2 className="font-bold text-lg">Cheating Detected!</h2>
+              <p>Your CPS exceeded the threshold for too long.</p>
+              <br />
+              <a
+                href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-red-500"
+              >
+                Stop it, get some help.
+              </a>
+              <div className="modal-action">
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowModal(false)}
+                >
+                  OK
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
