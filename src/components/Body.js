@@ -113,7 +113,6 @@ function Body() {
           setHighScore(count);
           setHighScoreDate(currentDate);
           setHighScoreDifference(difference);
-          setConfettiOpacity(1); // Reset conffeti opacity
           setIsHighScore(true); // Set the flag to trigger confetti and sound
         }
         set(countRef, 0).then(() => {
@@ -198,7 +197,6 @@ function Body() {
         setHighScore(count); // Update the local high score state
         setHighScoreDate(currentDate); // Update the local high score date
         setHighScoreDifference(difference); // Update highscore difference
-        setConfettiOpacity(1); // Reset conffeti opacity
         setIsHighScore(true); // Set the flag to trigger confetti
       }
       set(countRef, 0).then(() => {
@@ -273,23 +271,24 @@ function Body() {
       const fadeOutInterval = setInterval(() => {
         setConfettiOpacity((prevOpacity) => {
           if (prevOpacity > 0) {
-            return prevOpacity - 0.025; // Réduire l'opacité progressivement
+            return prevOpacity - 0.02; // Gradually reduce opacity
           } else {
             clearInterval(fadeOutInterval);
             return 0;
           }
         });
-      }, 100); // Intervalle de 100ms pour réduire l'opacité
+      }, 100); // 100ms interval to reduce opacity
 
       const timer = setTimeout(() => {
         setIsHighScore(false);
-        setConfettiOpacity(1); // Reset conffeti opacity
-      }, 6000); // Display confetti for 6 seconds
+      }, 5000); // Display confetti for 6 seconds
 
       return () => {
         clearTimeout(timer);
         clearInterval(fadeOutInterval);
       };
+    } else {
+      setConfettiOpacity(1); // Reset confetti opacity when they are hidden
     }
   }, [isHighScore, startTime]);
 

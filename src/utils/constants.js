@@ -1,3 +1,3 @@
-const CPS_WR = 10; // CPS WR
+const CPS_WR = 27; // CPS WR
 
 export default CPS_WR;
