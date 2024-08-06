@@ -2,15 +2,14 @@ import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAxeADK3OZwLI9fWLE3vcA8-luobGNo4rk",
-  authDomain: "button-online-64cd1.firebaseapp.com",
-  databaseURL:
-    "https://button-online-64cd1-default-rtdb.europe-west1.firebasedatabase.app/",
-  projectId: "button-online-64cd1",
-  storageBucket: "button-online-64cd1.appspot.com",
-  messagingSenderId: "1061969254925",
-  appId: "1:1061969254925:web:b2ec87596151d1a3a8d344",
-  measurementId: "G-JV6C85QR2E",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
