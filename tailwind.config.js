@@ -42,6 +42,12 @@ module.exports = {
         "1/2.5": "40%", // HighScore difference
       },
     },
+    fontFamily: {
+      handwriting: ["Schoolbell", "cursive"],
+    },
+    letterSpacing: {
+      tighter: "-0.10em",
+    },
   },
   plugins: [require("daisyui")],
   daisyui: {

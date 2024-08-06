@@ -3,8 +3,10 @@ import ThemeToggle from "./ThemeToggle";
 
 function Header({ toggleTheme, isDarkMode }) {
   return (
-    <header className="p-4 flex justify-between items-center">
-      <h1 className="text-3xl font-bold select-none">Button Online</h1>
+    <header className="p-4 flex justify-between items-center z-10">
+      <h1 className="text-4xl font-bold font-handwriting tracking-tighter">
+        BUTTON ONLINE
+      </h1>
       <ThemeToggle toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
     </header>
   );
