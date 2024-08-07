@@ -25,6 +25,22 @@ module.exports = {
           "0%": { opacity: 1, transform: "translateY(0)" },
           "100%": { opacity: 0, transform: "translateY(-8px)" },
         },
+        slideDownStats: {
+          "0%": { transform: "translateY(0)" },
+          "100%": { transform: "translateY(110%)" },
+        },
+        slideUpStats: {
+          "0%": { transform: "translateY(100%)" },
+          "100%": { transform: "translateY(0)" },
+        },
+        slideDownButton: {
+          "0%": { transform: "translateY(0)" },
+          "100%": { transform: "translateY(0)" },
+        },
+        slideUpButton: {
+          "0%": { transform: "translateY(90px)" },
+          "100%": { transform: "translateY(0)" },
+        },
       },
       animation: {
         spin: "spin 2s linear infinite",
@@ -32,6 +48,10 @@ module.exports = {
         pulsate: "pulsate 1.2s ease-out infinite",
         shrink: "shrink 0.2s ease-in-out",
         fadeUp: "fadeUp 2s ease-out forwards",
+        slideDownStats: "slideDownStats 0.3s ease-in-out forwards",
+        slideUpStats: "slideUpStats 0.3s ease-in-out forwards",
+        slideUpButton: "slideUpButton 0.3s ease-in-out forwards",
+        slideDownButton: "slideDownButton 0.3s ease-in-out forwards",
       },
       colors: {
         neonGreenLight: "#3BEE22",

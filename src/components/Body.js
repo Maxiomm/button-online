@@ -73,6 +73,13 @@ function Body() {
   // State to handle the modal display
   const [showModal, setShowModal] = useState(false);
 
+  // State to handle hiding or showing stats
+  const [showStats, setShowStats] = useState(true);
+
+  // State to handle animation of hiding or showing stats
+  const [animateStats, setAnimateStats] = useState("");
+  const [animateClickButton, setAnimateClickButton] = useState("");
+
   /* -----------FIREBASE REFERENCES----------- */
 
   // Firebase reference for the click count
@@ -271,7 +278,7 @@ function Body() {
       const fadeOutInterval = setInterval(() => {
         setConfettiOpacity((prevOpacity) => {
           if (prevOpacity > 0) {
-            return prevOpacity - 0.02; // Gradually reduce opacity
+            return prevOpacity - 0.019; // Gradually reduce opacity
           } else {
             clearInterval(fadeOutInterval);
             return 0;
@@ -281,7 +288,7 @@ function Body() {
 
       const timer = setTimeout(() => {
         setIsHighScore(false);
-      }, 5000); // Display confetti for 6 seconds
+      }, 5000); // Display confetti for 5 seconds
 
       return () => {
         clearTimeout(timer);
@@ -292,10 +299,23 @@ function Body() {
     }
   }, [isHighScore, startTime]);
 
+  const toggleStatsVisibility = () => {
+    if (showStats) {
+      setAnimateStats("animate-slideDownStats");
+      setAnimateClickButton("animate-slideDownButton");
+      setTimeout(() => setShowStats(false), 500);
+    } else {
+      setShowStats(true);
+      setAnimateStats("animate-slideUpStats");
+      setAnimateClickButton("animate-slideUpButton");
+    }
+  };
+
   /* -----------HTML----------- */
 
   return (
     <div className="relative flex flex-col h-screen bg-base-100 dark:bg-gray-900 w-full overflow-hidden">
+      <MovingDots />
       {isHighScore && (
         <Confetti
           opacity={confettiOpacity}
@@ -304,26 +324,37 @@ function Body() {
         />
       )}
       <audio ref={audioRef} src={cheerSound} preload="auto" />
-      <MovingDots />
       <Header toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
-      <div className="flex-grow flex justify-center items-center h-full mt-20">
+      <div
+        className={`flex-grow flex justify-center items-center h-full mt-10 z-10 ${animateClickButton}`}
+      >
         <ClickButton incrementCount={incrementCount} />
       </div>
-      <div className="w-full flex justify-center mb-4">
+      <div className={`w-full flex justify-center mb-4 z-10 ${animateStats}`}>
         <div className="max-w-5xl w-full">
-          <Stats
-            count={count}
-            individualCount={individualCount}
-            cps={cps}
-            timeLeft={timeLeft}
-            onlineCount={onlineCount}
-            highScore={highScore}
-            highScoreDate={highScoreDate}
-            isDarkMode={isDarkMode}
-            highScoreDifference={highScoreDifference}
-          />
+          {showStats && (
+            <Stats
+              count={count}
+              individualCount={individualCount}
+              cps={cps}
+              timeLeft={timeLeft}
+              onlineCount={onlineCount}
+              highScore={highScore}
+              highScoreDate={highScoreDate}
+              isDarkMode={isDarkMode}
+              highScoreDifference={highScoreDifference}
+            />
+          )}
         </div>
       </div>
+      <button
+        className={`btn btn-ghost fixed bottom-4 left-4 py-2 px-4 rounded font-bold z-10 ${
+          isDarkMode ? "bg-gray-850 text-white" : "bg-gray-150 text-black"
+        }`}
+        onClick={toggleStatsVisibility}
+      >
+        {showStats ? "Hide Stats" : "Show Stats"}
+      </button>
 
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50">

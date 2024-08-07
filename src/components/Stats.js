@@ -18,7 +18,7 @@ function Stats({
       setShowDifference(true);
       const timer = setTimeout(() => {
         setShowDifference(false);
-      }, 1000); // Display for 1 seconds
+      }, 1000); // Display for 1 second
 
       return () => clearTimeout(timer);
     }
@@ -26,7 +26,7 @@ function Stats({
 
   return (
     <div
-      className={`card w-full bg-base-100 shadow-xl my-4 border-2 ${
+      className={`card w-full bg-base-100 shadow-xl border-2 ${
         isDarkMode ? "border-gray-800" : "border-gray-100"
       }`}
     >
