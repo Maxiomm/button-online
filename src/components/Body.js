@@ -4,6 +4,7 @@ import Header from "./Header";
 import Stats from "./Stats";
 import ClickButton from "./ClickButton";
 import MovingDots from "./MovingDots";
+import AmongUs from "./AmongUs";
 import { useCountdown } from "../hooks/useCountdown";
 import { useOnlineUsers } from "../hooks/useOnlineUsers";
 import { ref, onValue, set } from "firebase/database";
@@ -79,6 +80,9 @@ function Body() {
   // State to handle animation of hiding or showing stats
   const [animateStats, setAnimateStats] = useState("");
   const [animateClickButton, setAnimateClickButton] = useState("");
+
+  // State to manage the delay before showing the first Among Us
+  const [showAmongUs, setShowAmongUs] = useState(false);
 
   /* -----------FIREBASE REFERENCES----------- */
 
@@ -311,11 +315,28 @@ function Body() {
     }
   };
 
+  // Effect to show the first Among Us after a delay
+  useEffect(() => {
+    if (!showAmongUs) {
+      const initialDelay = Math.random() * 120000 + 60000; // 1 to 3 minutes
+      const timer = setTimeout(() => {
+        setShowAmongUs(true);
+      }, initialDelay);
+
+      return () => clearTimeout(timer); // Cleanup timeout on component unmount
+    }
+  }, [showAmongUs]);
+
+  useEffect(() => {
+    console.log("showAmongUs in Body.js:", showAmongUs);
+  }, [showAmongUs]);
+
   /* -----------HTML----------- */
 
   return (
     <div className="relative flex flex-col h-screen bg-base-100 dark:bg-gray-900 w-full overflow-hidden">
       <MovingDots />
+      {showAmongUs && <AmongUs setShowAmongUs={setShowAmongUs} />}
       {isHighScore && (
         <Confetti
           opacity={confettiOpacity}

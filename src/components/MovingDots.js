@@ -18,7 +18,7 @@ const MovingDots = () => {
         x: Math.random() * window.innerWidth,
         y: Math.random() * window.innerHeight,
         size: Math.random() * 1.5 + 1,
-        speed: Math.random() * 0.5 + 0.1,
+        speed: Math.random() * 0.2 + 0.1,
         direction: Math.random() * 2 * Math.PI,
         color: getRandomGrayColor(), // Assign a random gray color
       });
