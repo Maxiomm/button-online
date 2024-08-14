@@ -2,12 +2,12 @@
 
 Here's the source code for the Button Online site: [https:/button-online.vercel.app](https://button-online.vercel.app/)
 
-![Logo Button Online](.buttononline.png)
+![Logo Button Online](./buttononline.png)
 
 ## Summary
 
 - [Tech Stack](#tech-stack)
-- [Auteurs](#auteurs)
+- [Team](#team)
 
 ## Tech Stack
 
@@ -16,6 +16,6 @@ Here's the source code for the Button Online site: [https:/button-online.vercel.
 - **Database :** Firebase
 - **Deployment :** Vercel
 
-## Auteurs
+## Team
 
 - **Me** - _Lead Developer_ - [GitHub](https://github.com/Maxiomm)
