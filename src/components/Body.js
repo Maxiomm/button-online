@@ -327,10 +327,6 @@ function Body() {
     }
   }, [showAmongUs]);
 
-  useEffect(() => {
-    console.log("showAmongUs in Body.js:", showAmongUs);
-  }, [showAmongUs]);
-
   /* -----------HTML----------- */
 
   return (
